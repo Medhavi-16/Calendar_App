@@ -28,8 +28,25 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
     @Override
     public void onBindViewHolder(EventsViewHolder holder, int position) {
         Event_db eventDb=list.get(position);
-
+        if(eventDb.getDescription().isEmpty())
+            holder.item.setText((eventDb.getTitle()));
+        else
         holder.item.setText((eventDb.getTitle()+"\n"+eventDb.getDescription()));
+        int type=eventDb.getType();
+        switch (type)
+        {
+            case 1:
+                holder.item.setCompoundDrawablesWithIntrinsicBounds(R.drawable.note,0,0,0);
+                break;
+            case 2:
+                holder.item.setCompoundDrawablesWithIntrinsicBounds(R.drawable.birthday,0,0,0);
+                break;
+            case 3:
+                holder.item.setCompoundDrawablesWithIntrinsicBounds(R.drawable.film,0,0,0);
+                break;
+            default: holder.item.setCompoundDrawablesWithIntrinsicBounds(R.drawable.move,0,0,0);
+        }
+
     }
     void setWords(List<Event_db> words){
         list = words;

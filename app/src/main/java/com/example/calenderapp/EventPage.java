@@ -27,6 +27,8 @@ public class EventPage extends AppCompatActivity {
     int type;
     String date1;
     private AppViewModel appViewModel;
+    Movie_Fragment movie_fragment;
+    TravelFragment travel_fragment;
     AppDatabase db;
 
     @Override
@@ -46,9 +48,13 @@ public class EventPage extends AppCompatActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         event_fragment = new Event_fragement();
         birthday_fragment = new Birthday_fragment();
+        movie_fragment=new Movie_Fragment();
+        travel_fragment=new TravelFragment();
         ft.replace(R.id.placeholder, event_fragment, "Event Fragment");
         ft.addToBackStack("Event Fragment");
         ft.commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment f = fragmentManager.findFragmentById(R.id.placeholder);
         // event_fragement.date.setText(date1);
 
         done.setOnClickListener(new View.OnClickListener() {
@@ -61,20 +67,38 @@ public class EventPage extends AppCompatActivity {
                     String event = event_fragment.event_name.getEditText().getText().toString();
                     Toast.makeText(getApplicationContext(), event, Toast.LENGTH_LONG).show();
                     title = event;
-                    desc = " ";
+                    desc = "";
                     type = 1;
                 }
                 if (tag.equals("Birthday Fragment")) {
                     String name = birthday_fragment.name.getEditText().getText().toString();
                     Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
                     title = name;
-                    desc = " ";
+                    desc = "";
                     type = 2;
                 }
+                if (tag.equals("Movie Fragment")) {
+                    String name = movie_fragment.movie.getEditText().getText().toString();
+                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                    desc="Time: "+movie_fragment.time.getEditText().getText().toString();
+                    title = name;
+
+                    type = 3;
+                }
+                if (tag.equals("Travel Fragment")) {
+                    String name = travel_fragment.dest.getEditText().getText().toString();
+                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                    desc="Time: "+travel_fragment.time.getEditText().getText().toString();
+                    title = name;
+
+                    type = 4;
+                }
+
                 saveTask();
 
-                Intent i=new Intent(EventPage.this,MainActivity.class);
-                startActivity(i);
+                /*Intent i=new Intent(EventPage.this,MainActivity.class);
+                startActivity(i);*/
+                finish();
             }
 
 
@@ -111,6 +135,28 @@ public class EventPage extends AppCompatActivity {
                 reset(2);
 
 
+            }
+        });
+        movie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.placeholder, movie_fragment, "Movie Fragment");
+                ft.addToBackStack("Movie Fragment");
+
+                ft.commit();
+                reset(3);
+            }
+        });
+        travel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.placeholder, travel_fragment, "Travel Fragment");
+                ft.addToBackStack("Travel Fragment");
+
+                ft.commit();
+                reset(4);
             }
         });
 
@@ -184,6 +230,14 @@ public class EventPage extends AppCompatActivity {
             }
         });
         Toast.makeText(getApplicationContext(),"Data Save",Toast.LENGTH_LONG).show();
+    }
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
 

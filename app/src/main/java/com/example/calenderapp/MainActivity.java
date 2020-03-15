@@ -8,6 +8,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -21,6 +22,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
@@ -38,14 +40,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     CalendarView calendar;
-    SearchView search;
+    Button showList;
     TextView date;
     ExtendedFloatingActionButton add;
-    RecyclerView eventList;
+
     SupportedDatePickerDialog.OnDateSetListener dateSetListener;
     private AppViewModel appViewModel;
     EventsAdapter adapter;
     public static AppDatabase appDatabase;
+    RecyclerView eventList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,22 +60,29 @@ public class MainActivity extends AppCompatActivity {
         add=findViewById(R.id.add);
         eventList=findViewById(R.id.event_list);
         eventList.setLayoutManager(new LinearLayoutManager(this));
-
+        eventList.addItemDecoration(new DividerItemDecoration(eventList.getContext(),DividerItemDecoration.VERTICAL));
+        showList=findViewById(R.id.showList);
         date=findViewById(R.id.date);
-        //search.setQueryHint("31/12/2000");
-        //search.setSubmitButtonEnabled(true);
+
         final  Calendar calendar1 = Calendar.getInstance();
         int year=calendar1.get(Calendar.YEAR);
         int month=calendar1.get(Calendar.MONTH);
         int day_of_month=calendar1.get(Calendar.DAY_OF_MONTH);
         int weekday=calendar1.get(Calendar.DAY_OF_WEEK);
-        String d=day_of_month+"/"+month+"/"+year+"\n"+getDay(weekday);
+        String d=day_of_month+"/"+(month+1)+"/"+year+"\n"+getDay(weekday);
         date.setText(d);
         //appViewModel= ViewModelProviders.of(this).get(AppViewModel.class);
         appDatabase= Room.databaseBuilder(getApplicationContext(),AppDatabase.class,"Events").allowMainThreadQueries().build();
 
         getEvents();
-        //search=findViewById(R.id.search);
+       showList.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               Intent i=new Intent(MainActivity.this,ShowDetailedView.class);
+               i.putExtra("date",date.getText().toString());
+               startActivity(i);
+           }
+       });
 
 
         add.setOnClickListener(v -> {
@@ -212,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         GetData gd=new GetData();
         gd.execute();
     }*/
-        Runnable r = new Runnable(){
+        /*Runnable r = new Runnable(){
             @Override
             public void run() {
                 String d=date.getText().toString();
@@ -225,13 +235,25 @@ public class MainActivity extends AppCompatActivity {
         };
 
         Thread newThread= new Thread(r);
-        newThread.start();
+        newThread.start();*/
+        String d=date.getText().toString();
+        List<Event_db> list = appDatabase.events_dao().getAllEventsOnDate(d);
+        Toast.makeText(getApplicationContext(),d,Toast.LENGTH_SHORT).show();
+        EventsAdapter adapter = new EventsAdapter(MainActivity.this, list);
+        adapter.notifyDataSetChanged();
+        eventList.setAdapter(adapter);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         getEvents();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     @Override
