@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+
+   <!-- <androidx.appcompat.widget.SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="date"
+        android:hint="date"
+        android:id="@+id/search"
+
+
+       />-->
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/galindo"
+        android:text="Date"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="25sp"
+        app:drawableLeftCompat="@drawable/ic_calendar_100"/>
+    <CalendarView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/calendar"
+        android:layout_marginTop="5dp"
+        android:dateTextAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+
+        android:focusedMonthDateColor="@color/black"
+        android:weekNumberColor="@color/black"
+        android:showWeekNumber="true">
+
+    </CalendarView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+
+
+       <com.google.android.material.card.MaterialCardView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/card"
+           android:layout_alignParentTop="true"
+           app:cardCornerRadius="30dp"
+           app:cardBackgroundColor="@color/colorAccent">
+           <com.google.android.material.textview.MaterialTextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="Events"
+               android:textSize="25sp"
+               android:textColor="@color/white"
+               android:layout_gravity="top"
+               android:id="@+id/events"
+               android:paddingHorizontal="45dp"
+               android:paddingVertical="10dp"
+
+
+               />
+
+       </com.google.android.material.card.MaterialCardView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/event_list"
+            android:layout_below="@+id/card">
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:backgroundTint="@color/white"
+            app:strokeWidth="0.7dp"
+            app:elevation="20dp"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            app:fabSize="auto"
+            app:strokeColor="@color/black"
+            app:icon="@drawable/ic_add_black_24dp"
+            android:textColor="@color/black"
+            android:id="@+id/add"
+            android:layout_marginStart="4dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true">
+
+        </com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton>
+    </RelativeLayout>
+
+
+
+
+</LinearLayout>
