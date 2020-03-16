@@ -101,7 +101,7 @@ public class EventPage extends AppCompatActivity {
                 if (tag.equals("Movie Fragment")) {
                     String name = movie_fragment.movie.getEditText().getText().toString();
                     String time = movie_fragment.time.getEditText().getText().toString();
-                    if(name.isEmpty() || time.isEmpty())
+                    if(name.isEmpty() && time.isEmpty())
                         Toast.makeText(getApplicationContext(),"Please enter a name or time", Toast.LENGTH_LONG).show();
                     else
                     {
@@ -117,7 +117,7 @@ public class EventPage extends AppCompatActivity {
                 if (tag.equals("Travel Fragment")) {
                     String name = travel_fragment.dest.getEditText().getText().toString();
                     String time = travel_fragment.time.getEditText().getText().toString();
-                    if(name.isEmpty() || time.isEmpty())
+                    if(name.isEmpty() && time.isEmpty())
                         Toast.makeText(getApplicationContext(),"Please enter a destination or time", Toast.LENGTH_LONG).show();
                     else
                     {
