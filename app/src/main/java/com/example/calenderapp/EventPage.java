@@ -30,6 +30,8 @@ public class EventPage extends AppCompatActivity {
     Movie_Fragment movie_fragment;
     TravelFragment travel_fragment;
     AppDatabase db;
+    int itype;
+    Intent i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +42,19 @@ public class EventPage extends AppCompatActivity {
         birthday = findViewById(R.id.birthday);
         travel = findViewById(R.id.travel);
         movie = findViewById(R.id.movie);
-        Intent i = getIntent();
+        i = getIntent();
         date = findViewById(R.id.set_date);
         date1 = i.getStringExtra("date");
+        itype = i.getIntExtra("itype", 1);
+        if (itype == 2)
+            update();
         date.setText(date1);
         appViewModel = ViewModelProviders.of(this).get(AppViewModel.class);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         event_fragment = new Event_fragement();
         birthday_fragment = new Birthday_fragment();
-        movie_fragment=new Movie_Fragment();
-        travel_fragment=new TravelFragment();
+        movie_fragment = new Movie_Fragment();
+        travel_fragment = new TravelFragment();
         ft.replace(R.id.placeholder, event_fragment, "Event Fragment");
         ft.addToBackStack("Event Fragment");
         ft.commit();
@@ -65,42 +70,74 @@ public class EventPage extends AppCompatActivity {
                 String tag = f.getTag();
                 if (tag.equals("Event Fragment")) {
                     String event = event_fragment.event_name.getEditText().getText().toString();
-                    Toast.makeText(getApplicationContext(), event, Toast.LENGTH_LONG).show();
-                    title = event;
-                    desc = "";
-                    type = 1;
+                    if(event.isEmpty())
+                        Toast.makeText(getApplicationContext(),"Please enter the event", Toast.LENGTH_LONG).show();
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), event, Toast.LENGTH_LONG).show();
+                        title = event;
+                        desc = "";
+                        type = 1;
+                        saveTask();
+                        finish();
+                    }
+
                 }
                 if (tag.equals("Birthday Fragment")) {
                     String name = birthday_fragment.name.getEditText().getText().toString();
-                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-                    title = name;
-                    desc = "";
-                    type = 2;
+                    if(name.isEmpty())
+                        Toast.makeText(getApplicationContext(),"PLease enter a name", Toast.LENGTH_LONG).show();
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                        title = name;
+                        desc = "";
+                        type = 2;
+                        saveTask();
+                        finish();
+                    }
+
                 }
                 if (tag.equals("Movie Fragment")) {
                     String name = movie_fragment.movie.getEditText().getText().toString();
-                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-                    desc="Time: "+movie_fragment.time.getEditText().getText().toString();
-                    title = name;
+                    String time = movie_fragment.time.getEditText().getText().toString();
+                    if(name.isEmpty() || time.isEmpty())
+                        Toast.makeText(getApplicationContext(),"Please enter a name or time", Toast.LENGTH_LONG).show();
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                        desc = "Time: " + movie_fragment.time.getEditText().getText().toString();
+                        title = name;
+                        type = 3;
+                        saveTask();
+                        finish();
+                    }
 
-                    type = 3;
                 }
                 if (tag.equals("Travel Fragment")) {
                     String name = travel_fragment.dest.getEditText().getText().toString();
-                    Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
-                    desc="Time: "+travel_fragment.time.getEditText().getText().toString();
-                    title = name;
+                    String time = travel_fragment.time.getEditText().getText().toString();
+                    if(name.isEmpty() || time.isEmpty())
+                        Toast.makeText(getApplicationContext(),"Please enter a destination or time", Toast.LENGTH_LONG).show();
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), name, Toast.LENGTH_LONG).show();
+                        desc = "Time: " + travel_fragment.time.getEditText().getText().toString();
+                        title = name;
 
-                    type = 4;
+                        type = 4;
+                        saveTask();
+                        finish();
+                    }
+
                 }
 
-                saveTask();
+
 
                 /*Intent i=new Intent(EventPage.this,MainActivity.class);
                 startActivity(i);*/
-                finish();
-            }
 
+            }
 
 
         });
@@ -194,43 +231,17 @@ public class EventPage extends AppCompatActivity {
     }
 
     private void saveTask() {
-            /*class SaveTask extends AsyncTask<Void, Void, Void> {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                   *//* Event_db eventDb=new Event_db();
-                    eventDb.setDate(date1);
-                    eventDb.setType(Integer.toString(type));
-                    eventDb.setTitle(title);
-                    eventDb.setDescription(desc);*//*
-                   String date1=date.getText().toString();
-                  // Toast.makeText(getApplicationContext(),date1,Toast.LENGTH_LONG).show();
-                    DatabaseClient.getInstance(getApplicationContext()).getAppDatabase().events_dao().insert(new Event_db(0,type,date1,title,desc));
-                    return null;
 
-                }
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
-                    finish();
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            SaveTask st = new SaveTask();
-            st.execute();
-            }*/
-        //appViewModel.insert(new Event_db(0, type, date1, title, desc));
-     //MainActivity.appDatabase.events_dao().insert(new Event_db(0, type, date1, title, desc));
-        db= Room.databaseBuilder(getApplicationContext(),AppDatabase.class,"Events").build();
+        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "Events").build();
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 db.events_dao().insert(new Event_db(0, type, date1, title, desc));
             }
         });
-        Toast.makeText(getApplicationContext(),"Data Save",Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Data Save", Toast.LENGTH_LONG).show();
     }
+
     @Override
     public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
@@ -238,6 +249,12 @@ public class EventPage extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void update() {
+
+        done.setText("UPDATE");
+
     }
 }
 

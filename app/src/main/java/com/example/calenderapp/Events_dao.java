@@ -29,7 +29,7 @@ public interface Events_dao {
     @Query("Update Events set title = :title,description = :description where id = :id")
     void update(String title, String description,int id);
     @Query("Select * from Events where id = :id")
-    Event_db[] getEvent(int id);
+    Event_db getEvent(int id);
 
 
 }

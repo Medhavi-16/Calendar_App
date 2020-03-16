@@ -21,6 +21,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     EventsAdapter adapter;
     public static AppDatabase appDatabase;
     RecyclerView eventList;
-
+    private int mCurrentItemPosition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,9 +88,11 @@ public class MainActivity extends AppCompatActivity {
        });
 
 
+
         add.setOnClickListener(v -> {
             Intent i=new Intent(MainActivity.this,EventPage.class);
             i.putExtra("date",date.getText().toString());
+            i.putExtra("itype",1);
             startActivity(i);
         });
 
@@ -167,81 +172,23 @@ public class MainActivity extends AppCompatActivity {
     }
     private void getEvents()
     {
-        /*class GetEvents extends AsyncTask<Void, Void, List<Event_db>> {
 
-            @Override
-            protected List<Event_db> doInBackground(Void... voids) {
-                String d=date.getText().toString();
-               *//* List<Event_db> taskList = DatabaseClient
-                        .getInstance(getApplicationContext())
-                        .getAppDatabase()
-                        .events_dao()
-                        .getAllEventsOnDate(d);*//*
-               List<Event_db> event_dbList=appDatabase.events_dao().getAllEventsOnDate(d);
-               // Toast.makeText(getApplicationContext(),event_dbList.size(),Toast.LENGTH_LONG).show();
-
-                return event_dbList;
-            }
-
-            @Override
-            protected void onPostExecute(List<Event_db> tasks) {
-                super.onPostExecute(tasks);
-                EventsAdapter adapter = new EventsAdapter(MainActivity.this, tasks);
-                eventList.setAdapter(adapter);
-            }
-        }
-
-        GetEvents gt = new GetEvents();
-        gt.execute();
-*/
-       /* appViewModel.getAllEventsOnDate(d).observe(this, new Observer<List<Event_db>>() {
-            @Override
-            public void onChanged(@Nullable final List<Event_db> event_dbs) {
-                // Update the cached copy of the words in the adapter.
-                adapter.setWords(event_dbs);
-                eventList.setAdapter(adapter);
-            }
-
-    });*/
-      /*  class GetEvents extends AsyncTask<Void, Void, List<Event_db>> {
-
-        @Override
-        protected List&lt;MyDataList> doInBackground(Void... voids) {
-        List&lt;MyDataList>myDataLists=MainActivity.myDatabase.myDao().getMyData();
-        return myDataLists;
-
-    }
-
-        @Override
-        protected void onPostExecute(List&lt;MyDataList> myDataList) {
-        MyAdapter adapter=new MyAdapter(myDataList);
-        rv.setAdapter(adapter);
-        super.onPostExecute(myDataList);
-    }
-        }
-        GetData gd=new GetData();
-        gd.execute();
-    }*/
-        /*Runnable r = new Runnable(){
-            @Override
-            public void run() {
-                String d=date.getText().toString();
-                List<Event_db> list = appDatabase.events_dao().getAllEventsOnDate(d);
-                EventsAdapter adapter = new EventsAdapter(MainActivity.this, list);
-                adapter.notifyDataSetChanged();
-                eventList.setAdapter(adapter);
-
-            }
-        };
-
-        Thread newThread= new Thread(r);
-        newThread.start();*/
         String d=date.getText().toString();
         List<Event_db> list = appDatabase.events_dao().getAllEventsOnDate(d);
         Toast.makeText(getApplicationContext(),d,Toast.LENGTH_SHORT).show();
-        EventsAdapter adapter = new EventsAdapter(MainActivity.this, list);
+        adapter = new EventsAdapter(MainActivity.this, list);
         adapter.notifyDataSetChanged();
         eventList.setAdapter(adapter);
+        registerForContextMenu(eventList);
+        adapter.setOnLongItemClickListener(new EventsAdapter.onLongItemClickListener() {
+            @Override
+            public void ItemLongClicked(View v, int position) {
+                mCurrentItemPosition = position;
+                v.showContextMenu();
+            }
+        });
+
+
     }
 
     @Override
@@ -266,6 +213,42 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         getEvents();
+    }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options, menu);
+        menu.setHeaderTitle("Select The Action");
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        if(item.getItemId()==R.id.delete){
+            Toast.makeText(getApplicationContext(),"Delete",Toast.LENGTH_LONG).show();
+            int id=adapter.getItem(mCurrentItemPosition).getId();
+            appDatabase.events_dao().delete(id);
+           // adapter.notifyDataSetChanged();
+            getEvents();
+        }
+        else if(item.getItemId()==R.id.update){
+            Toast.makeText(getApplicationContext(),"Update",Toast.LENGTH_LONG).show();
+            int id=adapter.getItem(mCurrentItemPosition).getId();
+            appDatabase.events_dao().delete(id);
+           update();
+        }else{
+            return false;
+        }
+        return true;
+    }
+    private void  update()
+    {
+
+        Intent i=new Intent(MainActivity.this,EventPage.class);
+        i.putExtra("date",date.getText().toString());
+        i.putExtra("itype",2);
+
+        startActivity(i);
     }
 }
 

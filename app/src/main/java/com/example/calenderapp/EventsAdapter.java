@@ -2,7 +2,9 @@ package com.example.calenderapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,6 +21,15 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
         this.mCtx = mCtx;
         this.list=list;
 
+    }
+    onLongItemClickListener mOnLongItemClickListener;
+
+    public void setOnLongItemClickListener(onLongItemClickListener onLongItemClickListener) {
+        mOnLongItemClickListener = onLongItemClickListener;
+    }
+
+    public interface onLongItemClickListener {
+        void ItemLongClicked(View v, int position);
     }
     @Override
     public EventsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -46,6 +57,16 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
                 break;
             default: holder.item.setCompoundDrawablesWithIntrinsicBounds(R.drawable.move,0,0,0);
         }
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mOnLongItemClickListener != null) {
+                    mOnLongItemClickListener.ItemLongClicked(v, position);
+                }
+
+                return true;
+            }
+        });
 
     }
     void setWords(List<Event_db> words){
@@ -60,8 +81,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
         else
             return 0;
     }
+    public Event_db getItem(int position) {
+        return list.get(position);
+    }
 
-    class EventsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class EventsViewHolder extends RecyclerView.ViewHolder {
         //TextView textViewStatus, textViewTask, textViewDesc, textViewFinishBy;
         TextView item;
 
@@ -69,27 +93,17 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
             super(itemView);
             item=itemView.findViewById(R.id.list_item);
 
+
             /*textViewStatus = itemView.findViewById(R.id.textViewStatus);
             textViewTask = itemView.findViewById(R.id.textViewTask);
             textViewDesc = itemView.findViewById(R.id.textViewDesc);
             textViewFinishBy = itemView.findViewById(R.id.textViewFinishBy);
 */
 
-            itemView.setOnClickListener(this);
+           // itemView.setOnClickListener(this);
         }
 
-        @Override
-        public void onClick(View view) {
-            Event_db eventDb=list.get(getAdapterPosition());
-            Intent i=new Intent(mCtx,EventPage.class);
-            mCtx.startActivity(i);
-            /*Task task = taskList.get(getAdapterPosition());
 
-            Intent intent = new Intent(mCtx, UpdateTaskActivity.class);
-            intent.putExtra("task", task);
-
-            mCtx.startActivity(intent);*/
-        }
     }
 
 }
